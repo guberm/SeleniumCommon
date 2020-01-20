@@ -378,7 +378,7 @@ namespace ADXAutomation
             return value;
         }
 
-        public static Dictionary<string, string> GetDataFromDBDict(string query, string db = null) {
+        public static Dictionary<string, string> GetDataFromDbDictionary(string query, string db = null) {
             Dictionary<string, string> dbData = new Dictionary<string, string>();
 
             connString = db == "AutomationDB"
@@ -607,8 +607,6 @@ namespace ADXAutomation
         }
 
         public static void EndDriver(IWebDriver driver) {
-            Common.UpdateTramServer(true);
-
             //videorec.Stop();
             _testStatus = TestContext.CurrentContext.Result.Outcome.Status;
             if (_testStatus != TestStatus.Passed) {
@@ -877,8 +875,8 @@ namespace ADXAutomation
                 password = ModuleData["uat_password"];
             }
 
-            string correctTrams = "10.249.209.117:24002/TRAMSService.svc/v2";
-            string incorrectTrams = "10.249.209.117:24009/TRAMSService.svc/v2";
+            string correctTrams = "0.0.0.0:24002/TRAMSService.svc/v2";
+            string incorrectTrams = "0.0.0.0:24009/TRAMSService.svc/v2";
 
             string path =
                 Path.Combine(
@@ -933,7 +931,7 @@ namespace ADXAutomation
                 }
             }
 
-            Dictionary<string, string> data = GetDataFromDBDict(
+            Dictionary<string, string> data = GetDataFromDbDictionary(
                 "SELECT TOP 1 c.ProfileName, COUNT(cc.ClientId) Ccount " +
                 "FROM ClientCompanions cc " +
                 "JOIN Clients c " +
