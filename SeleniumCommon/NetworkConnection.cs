@@ -2,7 +2,7 @@
 using System.Net;
 using System.Runtime.InteropServices;
 
-namespace ADXAutomation
+namespace Automation
 {
     /// <summary>
     /// Represents a network connection along with authentication to a network share.

@@ -1,4 +1,4 @@
-﻿using ADXAutomation;
+﻿using Automation;
 using AventStack.ExtentReports;
 using AventStack.ExtentReports.MarkupUtils;
 using AventStack.ExtentReports.Reporter;
@@ -9,7 +9,7 @@ using OpenQA.Selenium;
 using System;
 using System.Configuration;
 
-namespace AdxAutomation.Test
+namespace Automation.Test
 {
     public class ExtentReport
     {
@@ -33,11 +33,11 @@ namespace AdxAutomation.Test
                 string path = System.Reflection.Assembly.GetCallingAssembly().CodeBase;
                 string actualPath = path.Substring(0, path.LastIndexOf("bin"));
                 string projectPath = new Uri(actualPath).LocalPath;
-                string reportPath = projectPath + "Reports\\" + getDateTime() + "ADX.html";
+                string reportPath = projectPath + "Reports\\" + getDateTime() + "report.html";
                 htmlReporter = new ExtentHtmlReporter(@reportPath);
                 htmlReporter.Config.Theme = Theme.Dark;
-                htmlReporter.Config.DocumentTitle = "ADXDocument";
-                htmlReporter.Config.ReportName = "ADX_Report";
+                htmlReporter.Config.DocumentTitle = "Report Document";
+                htmlReporter.Config.ReportName = "Report";
                 extent = new ExtentReports();
                 extent.AttachReporter(htmlReporter);
                 extent.AddSystemInfo("OS", "Windows");

@@ -1,7 +1,7 @@
 ﻿using iTextSharp.text.pdf.parser;
 using System.Text;
 
-namespace ADXAutomation
+namespace Automation
 {
     public class PdfReader
     {

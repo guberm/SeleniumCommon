@@ -1,4 +1,4 @@
-﻿using AdxAutomation.Test;
+﻿using Automation.Test;
 using AventStack.ExtentReports.Utils;
 using log4net;
 using Microsoft.Expression.Encoder.ScreenCapture;
@@ -28,7 +28,7 @@ using System.Threading;
 using System.Xml;
 using Microsoft.Win32;
 
-namespace ADXAutomation
+namespace Automation
 {
     public class Common : ExtentReport
     {
@@ -89,7 +89,7 @@ namespace ADXAutomation
         }
 
         public static string GetScreenShot(IWebDriver driver, string screenShotName) {
-            string path = "C:\\AdxAutomationErrorScreenshots\\" + DateTime.Now.ToString("yyyy-MM-dd") + "\\";
+            string path = "C:\\AutomationErrorScreenshots\\" + DateTime.Now.ToString("yyyy-MM-dd") + "\\";
             bool exists = Directory.Exists(path);
             if (!exists) {
                 Directory.CreateDirectory(path);
@@ -111,7 +111,7 @@ namespace ADXAutomation
         }
 
         public static void GetWindowScreenShot(string screenShotName) {
-            string path = "C:\\AdxAutomationErrorScreenshots\\" + DateTime.Now.ToString("yyyy-MM-dd") + "\\";
+            string path = "C:\\AutomationErrorScreenshots\\" + DateTime.Now.ToString("yyyy-MM-dd") + "\\";
             bool exists = Directory.Exists(path);
             if (!exists) {
                 Directory.CreateDirectory(path);
@@ -454,13 +454,13 @@ namespace ADXAutomation
                 hour = $"0{hour}";
             }
 
-            string testName = TestContext.CurrentContext.Test.ClassName.Replace("ADXAutomation.Tests.", "");
+            string testName = TestContext.CurrentContext.Test.ClassName.Replace("Automation.Tests.", "");
             GlobalContext.Properties["LogName"] =
-                $"AdxAutomation_{_env}_{testName}.{TestContext.CurrentContext.Test.Name}_{hour}-{min}.log";
+                $"Automation_{_env}_{testName}.{TestContext.CurrentContext.Test.Name}_{hour}-{min}.log";
             GlobalContext.Properties["ApplicationName"] =
                 Assembly.GetExecutingAssembly().GetName().Name;
-            string pth = Assembly.GetExecutingAssembly().Location.Replace("ADXAutomation.dll", "");
-            FileInfo logfile = new FileInfo($"{pth}\\ADXAutomation.dll.config");
+            string pth = Assembly.GetExecutingAssembly().Location.Replace("Automation.dll", "");
+            FileInfo logfile = new FileInfo($"{pth}\\Automation.dll.config");
             log4net.Config.XmlConfigurator.ConfigureAndWatch(logfile);
 
             if (!Convert.ToBoolean(ConfigurationManager.AppSettings["is_trams_up"])) {
@@ -481,7 +481,7 @@ namespace ADXAutomation
                 chromeOptions.SetLoggingPreference(LogType.Server, LogLevel.All);
 
                 chromeOptions.AddUserProfilePreference("download.default_directory",
-                    @"C:\AdxAutomationItinerary\" + DateTime.Now.ToString("yyyy-MM-dd"));
+                    @"C:\AutomationItinerary\" + DateTime.Now.ToString("yyyy-MM-dd"));
 
                 driver = new ChromeDriver(chromeService, chromeOptions, timeout);
             }
@@ -834,7 +834,7 @@ namespace ADXAutomation
         public static string GetEnvironment(string outsideUrl = null) {
             string url = outsideUrl.IsNullOrEmpty() ? ConfigurationManager.AppSettings["url"] : outsideUrl;
 
-            if (url.Contains(".uat.") && !url.Contains("stgadx.uat.")) {
+            if (url.Contains(".uat.") && !url.Contains("stg.uat.")) {
                 return "UAT";
             }
 
@@ -842,11 +842,11 @@ namespace ADXAutomation
                 return "RC";
             }
 
-            if (url.Contains("stgadx.uat")) {
+            if (url.Contains("stg.uat")) {
                 return "STG UAT";
             }
 
-            if (url.Contains("adx.traveledge.com")) {
+            if (url.Contains("prod.com")) {
                 return "PROD";
             }
 
@@ -862,12 +862,12 @@ namespace ADXAutomation
 
             LoadConfiguration("server_connections");
 
-            if (ConfigurationManager.AppSettings["url"].Contains("adx.rc.te.tld")) {
+            if (ConfigurationManager.AppSettings["url"].Contains("rc.te.tld")) {
                 ip = ModuleData["rc_server_name"];
                 username = ModuleData["rc_username"];
                 password = ModuleData["rc_password"];
             }
-            else if (ConfigurationManager.AppSettings["url"].Contains("adx.uat.te.tld")) {
+            else if (ConfigurationManager.AppSettings["url"].Contains("uat.te.tld")) {
                 ip = ModuleData["uat_server_name"];
                 username = ModuleData["uat_username"];
                 password = ModuleData["uat_password"];
@@ -881,9 +881,9 @@ namespace ADXAutomation
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ??
                     throw new InvalidOperationException(), "Resources");
 
-            string fullPath = ConfigurationManager.AppSettings["url"].Contains("stgadx.uat.te.tld")
-                ? "C:\\TravelEdge\\STGADX\\Applications\\Api\\Web.config"
-                : "C:\\TravelEdge\\ADX\\Applications\\Api\\web.config";
+            string fullPath = ConfigurationManager.AppSettings["url"].Contains("stg.uat.te.tld")
+                ? "C:\\TravelEdge\\STG\\Applications\\Api\\Web.config"
+                : "C:\\TravelEdge\\Applications\\Api\\web.config";
 
             string cmdCommand;
             if (setCorrectTramsServer) {
