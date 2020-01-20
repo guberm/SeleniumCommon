@@ -218,7 +218,7 @@ namespace ADXAutomation
         public static bool IsElementPresent(IWebDriver driver, By by) {
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
             try {
-                var uuu = driver.FindElements(by);
+                ReadOnlyCollection<IWebElement> uuu = driver.FindElements(by);
                 return uuu.Count > 0;
             }
             catch (NoSuchElementException) {
@@ -329,8 +329,6 @@ namespace ADXAutomation
             }
 
             if (pageContent.ToLower().Contains("our backend system is unavailable")) {
-                //driver.FindElement(By.XPath("//button[.='Close']")).Click();
-                //Thread.Sleep(1000);
                 return true;
             }
 
@@ -725,7 +723,7 @@ namespace ADXAutomation
 
             while (!IsElementClicked(element, driver) && count < 100) {
                 ErrorsChecker(driver);
-                IWebElement el = driver.FindElements(By.XPath("//*[@class='row']"))[0];
+                IWebElement el = driver.FindElements(By.XPath("//*[@class='row']")).First();
 
                 if (count == 0) {
                     actions.MoveToElement(el).Click().Perform();
