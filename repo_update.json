@@ -1,5 +1,0 @@
-{
-  "description": "A .NET library providing common utilities and helper methods for Selenium WebDriver automation testing. Includes driver management, screenshot capture, PDF reading, database integration, and comprehensive HTML reporting.",
-  "homepage": "https://github.com/guberm/SeleniumCommon",
-  "topics": ["selenium", "automation", "testing", "csharp", "webdriver", "dotnet", "pdf", "screenshots", "reporting", "nunit"]
-}
