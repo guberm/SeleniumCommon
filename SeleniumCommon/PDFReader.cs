@@ -1,7 +1,7 @@
 ﻿using iTextSharp.text.pdf.parser;
 using System.Text;
 
-namespace Automation
+namespace SeleniumCommon
 {
     public class PdfReader
     {

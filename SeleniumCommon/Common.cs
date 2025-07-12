@@ -1,4 +1,4 @@
-﻿using Automation.Test;
+﻿using SeleniumCommon;
 using AventStack.ExtentReports.Utils;
 using log4net;
 using Microsoft.Expression.Encoder.ScreenCapture;
@@ -28,7 +28,7 @@ using System.Threading;
 using System.Xml;
 using Microsoft.Win32;
 
-namespace Automation
+namespace SeleniumCommon
 {
     public class Common : ExtentReport
     {
@@ -40,9 +40,9 @@ namespace Automation
 
         private static ScreenCaptureJob _videorec;
         private static TestStatus _testStatus;
-        private const string InitVector = "xxx";
+        private const string InitVector = "your-init-vector"; // TODO: Move to secure configuration
         private const int Keysize = 256;
-        private static string passPhrase = "yyy";
+        private static string passPhrase = "your-passphrase"; // TODO: Move to secure configuration
 
         public static ConcurrentDictionary<string, string> ModuleData;
         //private static string videoFile;
@@ -64,12 +64,21 @@ namespace Automation
         public static void AcceptAlert(IWebDriver driver) {
             try
             {
-                IAlert alert = ExpectedConditions.AlertIsPresent().Invoke(driver);
-                if (alert == null) return;
-                alert = driver.SwitchTo().Alert();
-                alert.Accept();
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(3));
+                IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
+                if (alert != null)
+                {
+                    alert.Accept();
+                }
             }
-            catch { }
+            catch (WebDriverTimeoutException)
+            {
+                // No alert present, which is fine
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"Error handling alert: {ex.Message}");
+            }
         }
 
         public static bool IsTextDisplayed(IWebDriver driver, string text) {
@@ -98,14 +107,13 @@ namespace Automation
             try {
                 ITakesScreenshot ts = (ITakesScreenshot) driver;
                 Screenshot screenshots = ts.GetScreenshot();
-                //string pth = System.Reflection.Assembly.GetCallingAssembly().CodeBase;
-                //string finalpth = pth.Substring(0, pth.LastIndexOf("bin")) + "ErrorScreenshots\\" + screenShotName + ".png";
                 string finalpth = path + screenShotName + ".png";
                 string localpath = new Uri(finalpth).LocalPath;
                 screenshots.SaveAsFile(localpath, ScreenshotImageFormat.Png);
                 return localpath;
             }
-            catch {
+            catch (Exception ex) {
+                Logger.Error($"Failed to capture screenshot: {ex.Message}");
                 return null;
             }
         }
@@ -117,30 +125,25 @@ namespace Automation
                 Directory.CreateDirectory(path);
             }
 
-            // Start the process...
-            Bitmap memoryImage = new Bitmap(1915, 1000);
-            Size s = new Size(memoryImage.Width, memoryImage.Height);
-
-            // Create graphics
-            Graphics memoryGraphics = Graphics.FromImage(memoryImage);
-
-            // Copy data from screen
-            memoryGraphics.CopyFromScreen(0, 0, 0, 0, s);
-
-            //That's it! Save the image in the directory and this will work like charm.
-            string finalpth = null;
             try {
-                //string pth = System.IO.Path
-                //    .GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)
-                //    ?.Substring(6);
-                //finalpth = pth.Substring(0, pth.LastIndexOf("bin")) + "ErrorScreenshots\\" + screenShotName + ".png";
+                // Start the process...
+                Bitmap memoryImage = new Bitmap(1915, 1000);
+                Size s = new Size(memoryImage.Width, memoryImage.Height);
 
-                finalpth = path + screenShotName + ".png";
+                // Create graphics
+                Graphics memoryGraphics = Graphics.FromImage(memoryImage);
+
+                // Copy data from screen
+                memoryGraphics.CopyFromScreen(0, 0, 0, 0, s);
+
+                string finalpth = path + screenShotName + ".png";
+
+                // Save it!
+                memoryImage.Save(finalpth, ImageFormat.Png);
             }
-            catch { }
-
-            // Save it!
-            if (finalpth != null) memoryImage.Save(finalpth, ImageFormat.Png);
+            catch (Exception ex) {
+                Logger.Error($"Failed to capture window screenshot: {ex.Message}");
+            }
         }
 
         public static void LoadConfiguration(string dbTableName) {
@@ -358,7 +361,7 @@ namespace Automation
             string value = null;
             connString = db == "AutomationDB"
                 ? ConfigurationManager.ConnectionStrings["AutomationDB"].ConnectionString
-                : $"data source=10.10.2.116;initial catalog=TravelEdge_{_env};persist security info=true;user id=traveledge;password=qqq;multipleactiveresultsets=true";
+                : ConfigurationManager.ConnectionStrings["TravelEdgeDB"]?.ConnectionString; // TODO: Remove hardcoded connection
 
             using (SqlConnection conn =
                 new SqlConnection(connString)) {
@@ -381,7 +384,7 @@ namespace Automation
 
             connString = db == "AutomationDB"
                 ? ConfigurationManager.ConnectionStrings["AutomationDB"].ConnectionString
-                : $"data source=10.10.2.116;initial catalog=TravelEdge_{_env};persist security info=true;user id=traveledge;password=qqq;multipleactiveresultsets=true";
+                : ConfigurationManager.ConnectionStrings["TravelEdgeDB"]?.ConnectionString; // TODO: Remove hardcoded connection
 
             using (SqlConnection conn = new SqlConnection(connString)) {
                 conn.Open();
@@ -403,7 +406,7 @@ namespace Automation
 
             connString = db == "AutomationDB"
                 ? ConfigurationManager.ConnectionStrings["AutomationDB"].ConnectionString
-                : $"data source=10.10.2.116;initial catalog=TravelEdge_{_env};persist security info=true;user id=traveledge;password=qqq;multipleactiveresultsets=true";
+                : ConfigurationManager.ConnectionStrings["TravelEdgeDB"]?.ConnectionString; // TODO: Remove hardcoded connection
 
             using (SqlConnection conn =
                 new SqlConnection(connString)) {
@@ -421,7 +424,7 @@ namespace Automation
         public static void DeleteDataFromDb(string deleteCommand, string db) {
             connString = db == "AutomationDB"
                 ? ConfigurationManager.ConnectionStrings["AutomationDB"].ConnectionString
-                : $"data source=10.10.2.116;initial catalog=TravelEdge_{_env};persist security info=true;user id=traveledge;password=qqq;multipleactiveresultsets=true";
+                : ConfigurationManager.ConnectionStrings["TravelEdgeDB"]?.ConnectionString; // TODO: Remove hardcoded connection
 
             using (SqlConnection conn =
                 new SqlConnection(connString)) {
@@ -440,7 +443,7 @@ namespace Automation
             _env = GetEnvironment(url);
 
             connString =
-                $"data source=10.10.2.116;initial catalog=TravelEdge_{_env};persist security info=true;user id=traveledge;password=qqq;multipleactiveresultsets=true"; //ConfigurationManager.ConnectionStrings[db].ConnectionString;
+                ConfigurationManager.ConnectionStrings["TravelEdgeDB"]?.ConnectionString; // TODO: Remove hardcoded connection - was: $"data source=10.10.2.116;initial catalog=TravelEdge_{_env};persist security info=true;user id=traveledge;password=qqq;multipleactiveresultsets=true";
 
             log4net.Config.XmlConfigurator.Configure();
 
@@ -873,8 +876,8 @@ namespace Automation
                 password = ModuleData["uat_password"];
             }
 
-            string correctTrams = "0.0.0.0:24002/TRAMSService.svc/v2";
-            string incorrectTrams = "0.0.0.0:24009/TRAMSService.svc/v2";
+            string correctTrams = ConfigurationManager.AppSettings["correctTramsEndpoint"] ?? "default-endpoint:24002/TRAMSService.svc/v2";
+            string incorrectTrams = ConfigurationManager.AppSettings["incorrectTramsEndpoint"] ?? "default-endpoint:24009/TRAMSService.svc/v2";
 
             string path =
                 Path.Combine(

@@ -1,4 +1,4 @@
-﻿using Automation;
+﻿using SeleniumCommon;
 using AventStack.ExtentReports;
 using AventStack.ExtentReports.MarkupUtils;
 using AventStack.ExtentReports.Reporter;
@@ -9,7 +9,7 @@ using OpenQA.Selenium;
 using System;
 using System.Configuration;
 
-namespace Automation.Test
+namespace SeleniumCommon
 {
     public class ExtentReport
     {
